@@ -2,7 +2,7 @@
  * Final Project made by Christopher A. Mendoza
  * Traffic Light System W. WIFI Integration
  * UTEP 2023
- * last edited and finalized: 4/14/2023 
+ * last edited: 4/16/2023
  */
 
 #include <stdio.h>
