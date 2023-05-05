@@ -64,17 +64,17 @@ long int flag_1, flag_2, flag_3, flag_4 = 0;
 #define BUTTON_6 39
 #define BUTTON_7 36
 
-/*==================== CH-1.0 - WI-FI====================*/
-/*============================ Chapter 1.0: Wi-Fi and Web-Server=========================*/
+/*================================================================== CH-1.0 - WI-FI=======================================================================*/
+/*============================================================= Chapter 1.0: Wi-Fi and Web-Server=========================================================*/
 char on_resp[] = "<!DOCTYPE html><html><head><style type=\"text/css\">html {  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center; background-color: #101010;}h2{  color: white;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Traffic Pedestrian Request</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\" ></head><body>  <h2>Traffic Pedestrian Request</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-walking fa-2x\" style=\"color:#2a2a2a;\"></i>     <strong>North & South</strong></p>        <p>          <a href=\"/nsbutton1\"><button class=\"button\">ON</button></a>          <a href=\"/nsbutton2\"><button class=\"button button2\">OFF</button></a>        </p>      </div>      <div class=\"card\">        <p><i class=\"fas fa-walking fa-2x\" style=\"color:#2a2a2a;\"></i>     <strong>East & West</strong></p>        <p>          <a href=\"/ewbutton1\"><button class=\"button\">ON</button></a>          <a href=\"/ewbutton2\"><button class=\"button button2\">OFF</button></a>        </p>      </div>    </div>  </div></body></html>";
 
 char off_resp[] = "<!DOCTYPE html><html><head><style type=\"text/css\">html {  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;background-color: #101010;}h2{  color: white;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Traffic Pedestrian Request</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\" ></head><body>  <h2>Traffic Pedestrian Request</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-walking fa-2x\" style=\"color:#2a2a2a;\"></i>     <strong>North & South</strong></p>        <p>          <a href=\"/nsbutton1\"><button class=\"button\">ON</button></a>          <a href=\"/nsbutton2\"><button class=\"button button2\">OFF</button></a>        </p>      </div>      <div class=\"card\">        <p><i class=\"fas fa-walking fa-2x\" style=\"color:#2a2a2a;\"></i>     <strong>East & West</strong></p>        <p>          <a href=\"/ewbutton1\"><button class=\"button\">ON</button></a>          <a href=\"/ewbutton2\"><button class=\"button button2\">OFF</button></a>        </p>      </div>    </div>  </div></body></html>";
 
 static const char *TAG = "espressif"; // TAG for debug
 
-#define EXAMPLE_ESP_WIFI_SSID "OUTLAW_THIS-2.4"
-#define EXAMPLE_ESP_WIFI_PASS "outlawzz"
-#define EXAMPLE_ESP_MAXIMUM_RETRY 10
+#define WIFI_SSID "" //username
+#define WIFI_PASS "" //password
+#define MAXIMUM_RETRY 10 //The esp32 will try to connect the wifi(or router) and try to connect to the preset user and pass
 static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
@@ -91,7 +91,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
-        if (s_retry_num < EXAMPLE_ESP_MAXIMUM_RETRY)
+        if (s_retry_num < MAXIMUM_RETRY)
         {
             esp_wifi_connect();
             s_retry_num++;
@@ -136,14 +136,11 @@ void connect_wifi(void)
                                                         &event_handler,
                                                         NULL,
                                                         &instance_got_ip));
-
+  //This struct is where we are setting the WIFI USER and PASS
     wifi_config_t wifi_config = {
         .sta = {
-            .ssid = EXAMPLE_ESP_WIFI_SSID,
-            .password = EXAMPLE_ESP_WIFI_PASS,
-            /* Setting a password implies station will connect to all security modes including WEP/WPA.
-             * However these modes are deprecated and not advisable to be used. Incase your Access point
-             * doesn't support WPA2, these mode can be enabled by commenting below line */
+            .ssid = WIFI_SSID,
+            .password = WIFI_PASS,
             .threshold.authmode = WIFI_AUTH_WPA2_PSK,
         },
     };
@@ -161,17 +158,16 @@ void connect_wifi(void)
                                            pdFALSE,
                                            portMAX_DELAY);
 
-    /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
-     * happened. */
+    //If we read the monitor in the terminal, we can see the WiFi reading into this
     if (bits & WIFI_CONNECTED_BIT)
     {
-        ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
-                 EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
+      ESP_LOGI(TAG, "Connection Succesfull!!!")
+      ESP_LOGI(TAG, "ESP32 is connected to SSID:%s password:%s", WIFI_SSID, WIFI_PASS);
     }
     else if (bits & WIFI_FAIL_BIT)
     {
-        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
-                 EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
+      ESP_LOGI(TAG, "Connection Failed!!!")
+      ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", WIFI_SSID, WIFI_PASS);
     }
     else
     {
